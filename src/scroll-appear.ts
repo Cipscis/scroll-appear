@@ -3,23 +3,16 @@ import { debounce } from '@cipscis/debounce';
 
 import passiveSupported from './eventListenerPassiveSupport.js';
 
-enum ScrollAppearState {
-	HIDDEN = 'hidden',
-	VISIBLE = 'visible',
-}
+import { selectors } from './constants.js';
+import { hideElement } from './elements.js';
+import { isElementInViewport } from './viewport.js';
 
-const dataAttributes = {
-	state: 'data-scroll-appear-state',
-} as const;
-
-const selectors = {
-	uninitialised: `.js-scroll-appear:not([${dataAttributes.state}])`,
-	hidden: `.js-scroll-appear[${dataAttributes.state}="${ScrollAppearState.HIDDEN}"]`,
-	visible: `.js-scroll-appear[${dataAttributes.state}="${ScrollAppearState.VISIBLE}"]`,
-} as const;
+import { ScrollAppearQueue } from './ScrollAppearQueue.js';
 
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
 const delay = 100;
+
+const queue = new ScrollAppearQueue();
 
 /**
  * Initialise ScrollAppear for a particular set of elements
@@ -36,9 +29,9 @@ export function init($container: Element | Document = document): void {
 function _initElements($container: Element | Document = document): void {
 	const $elements = $container.querySelectorAll(selectors.uninitialised);
 
-	$elements.forEach(_hideElement);
+	$elements.forEach(hideElement);
 
-	_showElementsInViewport();
+	_queueElementsInViewport();
 }
 
 /**
@@ -46,66 +39,41 @@ function _initElements($container: Element | Document = document): void {
  * scrolling or resizing.
  */
 function _initEvents(): void {
-	const throttledShow = throttle(_showElementsInViewport, delay);
-	const debouncedShow = debounce(_showElementsInViewport, delay);
-
 	const passiveOptions = passiveSupported ? { passive: true } : true;
+
+	const throttledShow = throttle(_queueElementsInViewport, delay);
+	const debouncedShow = debounce(_queueElementsInViewport, delay);
 
 	window.addEventListener('scroll', throttledShow, passiveOptions);
 	window.addEventListener('scroll', debouncedShow, passiveOptions);
 
 	window.addEventListener('resize', throttledShow, passiveOptions);
 	window.addEventListener('resize', debouncedShow, passiveOptions);
+
+	const throttledCatchUp = throttle(_catchUpQueue, delay);
+	const debouncedCatchUp = debounce(_catchUpQueue, delay);
+
+	window.addEventListener('scroll', throttledCatchUp, passiveOptions);
+	window.addEventListener('scroll', debouncedCatchUp, passiveOptions);
+
+	window.addEventListener('resize', throttledCatchUp, passiveOptions);
+	window.addEventListener('resize', debouncedCatchUp, passiveOptions);
 }
 
 /**
- * Find all Elements in the viewport, and show them.
+ * Add all hidden elements in the viewport to the queue
  */
-function _showElementsInViewport(): void {
-	const $hiddenElements = Array.from(document.querySelectorAll(selectors.hidden));
+function _queueElementsInViewport(): void {
+	const $hiddenElements = document.querySelectorAll(selectors.hidden);
 
-	const $elementsToAppear = $hiddenElements.filter(_isElementInViewport);
+	const $hiddenElementsInViewport = Array.from($hiddenElements).filter(isElementInViewport);
 
-	$elementsToAppear.forEach(_showElement);
+	$hiddenElementsInViewport.forEach(($element) => queue.push($element));
 }
 
 /**
- * Hide a specific element
+ * Tell the queue to "catch up" with the viewport
  */
-function _hideElement($element: Element): void {
-	$element.setAttribute(dataAttributes.state, ScrollAppearState.HIDDEN);
-}
-
-/**
- * Show a specific Element.
- */
-function _showElement($element: Element): void {
-	$element.setAttribute(dataAttributes.state, ScrollAppearState.VISIBLE);
-}
-
-/**
- * Checks if an Element is in the viewport. Only checks vertical boundaries, not horizontal.
- */
-function _isElementInViewport($element: Element, threshold: number = 0): boolean {
-	const windowHeight = window.innerHeight;
-	const maxThreshold = (windowHeight / 2) - 50;
-	if (threshold > maxThreshold) {
-		threshold = maxThreshold;
-	}
-
-	const coords = $element.getBoundingClientRect();
-
-	const viewportHeight = window.innerHeight || document.documentElement.clientWidth;
-	const viewportTop = threshold;
-	const viewportBottom = viewportHeight - threshold;
-
-	// Is the bottom of the element below the top of the viewport?
-	const belowTop = coords.bottom >= viewportTop;
-
-	// Is the top of the element above the bottom of the viewport?
-	const aboveBottom = coords.top <= viewportBottom;
-
-	const inViewport = belowTop && aboveBottom;
-
-	return inViewport;
+function _catchUpQueue(): void {
+	queue.catchUp();
 }
