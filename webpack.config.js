@@ -25,7 +25,7 @@ const config = {
 		fullySpecified: true,
 		plugins: [new ResolveTypeScriptPlugin()],
 		alias: {
-			'@cipscis/base-package': `${srcPath}/main-export.ts`,
+			'@cipscis/scroll-appear': `${srcPath}/scroll-appear.ts`,
 		},
 	},
 	module: {

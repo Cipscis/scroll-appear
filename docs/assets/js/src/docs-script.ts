@@ -1,3 +1,3 @@
-import { foo } from '@cipscis/base-package';
+import { foo } from '@cipscis/scroll-appear';
 
 console.log(foo());
