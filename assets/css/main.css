@@ -1,0 +1,33 @@
+.layout {
+  margin: 20px auto 200px;
+  max-width: 800px;
+}
+
+.example__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-gap: 20px;
+  max-width: 580px;
+}
+
+.example {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: red;
+  color: white;
+}
+.example[data-scroll-appear-state=visible] {
+  transition: all 0.3s ease-in-out;
+}
+@media (prefers-reduced-motion) {
+  .example[data-scroll-appear-state=visible] {
+    transition: none;
+  }
+}
+.example[data-scroll-appear-state=hidden] {
+  opacity: 0;
+  transform: translateY(100px);
+}
