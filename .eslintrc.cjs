@@ -43,11 +43,23 @@ module.exports = {
 		// especially if a variable's default value might change in the future
 		'@typescript-eslint/no-inferrable-types': 'off',
 
+		// A function returning a `Promise<void>` should be able to go unchecked just
+		// like a function that returns `void`
+		'@typescript-eslint/no-misused-promises': [
+			'error',
+			{
+				checksVoidReturn: false,
+			},
+		],
+
 		// I like being able to use `'' + val` to coerce an unknown type to a string
 		'@typescript-eslint/restrict-plus-operands': 'off',
 
 		// I don't mind type coercion in string literal expressions
 		'@typescript-eslint/restrict-template-expressions': 'off',
+
+		// There are legitimate uses for empty functions
+		'@typescript-eslint/no-empty-function': 'off',
 
 		// Using `any[]` for rest arguments can sometimes be necessary
 		'@typescript-eslint/no-explicit-any': [

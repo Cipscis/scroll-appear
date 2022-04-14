@@ -1,0 +1,14 @@
+@mixin scroll-appear($duration: 0.3s, $easing: ease-in-out) {
+	&[data-scroll-appear-state="visible"] {
+		// TODO: Set up proper transitions
+		transition: all $duration $easing;
+
+		@media (prefers-reduced-motion) {
+			transition: none;
+		}
+	}
+
+	&[data-scroll-appear-state="hidden"] {
+		@content;
+	}
+}
