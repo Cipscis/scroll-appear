@@ -51,6 +51,7 @@ function _initElement($element: Element): void {
 function _initEvents(): void {
 	const passiveOptions = passiveSupported ? { passive: true } : true;
 
+	// TODO: Bind events in a way that prevents a single scroll or resize event from firing the handler twice
 	const throttledShow = throttle(_queueElementsInViewport, delay);
 	const debouncedShow = debounce(_queueElementsInViewport, delay);
 

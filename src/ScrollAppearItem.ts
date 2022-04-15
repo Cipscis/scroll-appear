@@ -2,8 +2,6 @@ import { isScrollAppearState } from './ScrollAppearState.js';
 import { attributes } from './domMap.js';
 import { ScrollAppearState } from './ScrollAppearState.js';
 
-import { isElementInViewport } from './viewport.js';
-
 /**
  * This `Map` is used to store each `ScrollAppearItem` created against
  * the `Element` used to instantiate it, so we can ensure no `Element`
@@ -40,8 +38,32 @@ class ScrollAppearItem {
 		}
 	}
 
-	isInViewport(): boolean {
-		return isElementInViewport(this.#$element);
+	/**
+	 * Checks if a `ScrollAppearItem`'s `Element` is in the viewport.
+	 * Only checks vertical boundaries, not horizontal.
+	 */
+	isInViewport(threshold: number = 0): boolean {
+		const windowHeight = window.innerHeight;
+		const maxThreshold = (windowHeight / 2) - 50;
+		if (threshold > maxThreshold) {
+			threshold = maxThreshold;
+		}
+
+		const coords = this.#$element.getBoundingClientRect();
+
+		const viewportHeight = window.innerHeight || document.documentElement.clientWidth;
+		const viewportTop = threshold;
+		const viewportBottom = viewportHeight - threshold;
+
+		// Is the bottom of the element below the top of the viewport?
+		const belowTop = coords.bottom >= viewportTop;
+
+		// Is the top of the element above the bottom of the viewport?
+		const aboveBottom = coords.top <= viewportBottom;
+
+		const inViewport = belowTop && aboveBottom;
+
+		return inViewport;
 	}
 
 	appear(): void {

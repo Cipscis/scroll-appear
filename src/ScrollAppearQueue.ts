@@ -1,16 +1,19 @@
 import { ScrollAppearState } from './ScrollAppearState.js';
 import { ScrollAppearItem } from './ScrollAppearItem.js';
 
-// TODO: Make the first item appear immediately, so its delay affects the item after it instead
 // TODO: Allow for multiple queues, based either on an ID in a data attribute or a containing element
 
 export class ScrollAppearQueue {
-	items: ScrollAppearItem[];
-	timeout: ReturnType<typeof setTimeout> | null;
+	#items: ScrollAppearItem[];
+	#timeout: ReturnType<typeof setTimeout> | null;
+	#delayRemovalTimeout: ReturnType<typeof setTimeout> | null;
+	#lastItemDelay: number;
 
 	constructor() {
-		this.items = [];
-		this.timeout = null;
+		this.#items = [];
+		this.#timeout = null;
+		this.#delayRemovalTimeout = null;
+		this.#lastItemDelay = 0;
 	}
 
 	/**
@@ -23,7 +26,7 @@ export class ScrollAppearQueue {
 
 		// If the item is hidden, add it to the queue and schedule its appearance
 		if (item.getState() === ScrollAppearState.HIDDEN) {
-			this.items.push(item);
+			this.#items.push(item);
 			this.#scheduleAppearance();
 		}
 	}
@@ -32,8 +35,8 @@ export class ScrollAppearQueue {
 	 * Immediately show any items that have left the viewport
 	 */
 	catchUp(): void {
-		for (let i = 0; i < this.items.length; i++) {
-			const item = this.items[i];
+		for (let i = 0; i < this.#items.length; i++) {
+			const item = this.#items[i];
 
 			if (item.isInViewport() === false) {
 				if (i === 0) {
@@ -57,35 +60,55 @@ export class ScrollAppearQueue {
 	 * Checks if an item is already in the queue
 	 */
 	#isInQueue(item: ScrollAppearItem): boolean {
-		const inQueue = this.items.find((queueItem) => queueItem === item);
+		const inQueue = this.#items.includes(item);
 
-		return !!inQueue;
+		return inQueue;
 	}
 
 	/**
 	 * Schedule the appearance of the first item in the queue
 	 */
 	#scheduleAppearance(): void {
-		const nextItem = this.items[0];
-
-		if (nextItem && this.timeout === null) {
-			this.timeout = setTimeout(() => this.#appearFirstItem(), nextItem.delay);
+		// If the queue is empty, remove any delay for the next appearance
+		if (this.#items.length === 0) {
+			this.#delayRemovalTimeout = setTimeout(() => {
+				this.#lastItemDelay = 0;
+				this.#delayRemovalTimeout = null;
+			}, this.#lastItemDelay);
+			return;
 		}
+
+		// If the next item is already scheduled to appear, do nothing
+		if (this.#timeout !== null) {
+			return;
+		}
+
+		this.#timeout = setTimeout(() => this.#appearFirstItem(), this.#lastItemDelay);
 	}
 
 	/**
 	 * Make the first item in the queue appear
 	 */
 	#appearFirstItem(): void {
-		if (this.timeout) {
-			clearTimeout(this.timeout);
+		// If we were waiting to remove the delay for the next item,
+		// stop because it's no longer relevant
+		if (this.#delayRemovalTimeout) {
+			clearTimeout(this.#delayRemovalTimeout);
+			this.#delayRemovalTimeout = null;
 		}
-		this.timeout = null;
 
-		const nextItem = this.items.shift();
+		// If we were waiting to display the next item,
+		// stop because it's happening now
+		if (this.#timeout) {
+			clearTimeout(this.#timeout);
+		}
+		this.#timeout = null;
 
-		if (nextItem) {
-			nextItem.appear();
+		const firstItem = this.#items.shift();
+
+		if (firstItem) {
+			firstItem.appear();
+			this.#lastItemDelay = firstItem.delay;
 			this.#scheduleAppearance();
 		}
 	}
