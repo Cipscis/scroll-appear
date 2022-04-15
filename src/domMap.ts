@@ -3,9 +3,11 @@
 
 export const selectors = {
 	item: '.js-scroll-appear',
+	container: '.js-scroll-appear__container',
 } as const;
 
 export const attributes = {
 	state: 'data-scroll-appear-state',
 	delay: 'data-scroll-appear-delay',
+	queue: 'data-scroll-appear-queue',
 } as const;

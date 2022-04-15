@@ -1,8 +1,6 @@
 import { ScrollAppearState } from './ScrollAppearState.js';
 import { ScrollAppearItem } from './ScrollAppearItem.js';
 
-// TODO: Allow for multiple queues, based either on an ID in a data attribute or a containing element
-
 export class ScrollAppearQueue {
 	#items: ScrollAppearItem[];
 	#timeout: ReturnType<typeof setTimeout> | null;

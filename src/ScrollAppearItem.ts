@@ -1,6 +1,12 @@
 import { isScrollAppearState } from './ScrollAppearState.js';
-import { attributes } from './domMap.js';
+import {
+	selectors,
+	attributes,
+} from './domMap.js';
 import { ScrollAppearState } from './ScrollAppearState.js';
+
+import { getQueue } from './queues.js';
+import { ScrollAppearQueue } from './ScrollAppearQueue.js';
 
 /**
  * This `Map` is used to store each `ScrollAppearItem` created against
@@ -21,7 +27,8 @@ export function getScrollAppearItem($element: Element): ScrollAppearItem {
 
 class ScrollAppearItem {
 	#$element: Element;
-	delay: number;
+	#$queue: ScrollAppearQueue;
+	#delay: number;
 
 	constructor($element: Element) {
 		if (scrollAppearItems.has($element)) {
@@ -31,7 +38,8 @@ class ScrollAppearItem {
 		}
 
 		this.#$element = $element;
-		this.delay = Number($element.getAttribute(attributes.delay)) || 0;
+		this.#$queue = this.#findQueue();
+		this.#delay = Number($element.getAttribute(attributes.delay)) || 0;
 
 		if (this.getState() === ScrollAppearState.UNINITIALISED) {
 			this.#setState(ScrollAppearState.HIDDEN);
@@ -39,6 +47,10 @@ class ScrollAppearItem {
 
 		// Make this item appear as soon as it or any of its descendents receive focus
 		this.#$element.addEventListener('focusin', () => this.appear(), { once: true });
+	}
+
+	get delay(): number {
+		return this.#delay;
 	}
 
 	/**
@@ -69,14 +81,23 @@ class ScrollAppearItem {
 		return inViewport;
 	}
 
+	/**
+	 * Make an element appear
+	 */
 	appear(): void {
 		this.#setState(ScrollAppearState.VISIBLE);
 	}
 
+	/**
+	 * Update the DOM to reflect a new `ScrollAppearState`
+	 */
 	#setState(state: ScrollAppearState): void {
 		this.#$element.setAttribute(attributes.state, state);
 	}
 
+	/**
+	 * Query the DOM to retrieve the current `ScrollAppearState`
+	 */
 	getState(): ScrollAppearState {
 		const state = this.#$element.getAttribute(attributes.state);
 
@@ -85,6 +106,33 @@ class ScrollAppearItem {
 		} else {
 			return ScrollAppearState.UNINITIALISED;
 		}
+	}
+
+	/**
+	 * Find an item's appropriate `ScrollAppearQueue`
+	 */
+	#findQueue(): ScrollAppearQueue {
+		// First, check if the queue ID is specified via an attribute
+		const queueId = this.#$element.getAttribute(attributes.queue);
+		if (queueId) {
+			return getQueue(queueId);
+		}
+
+		// Then, check if the item is inside a container
+		const $container = this.#$element.closest(selectors.container);
+		if ($container) {
+			return getQueue($container);
+		}
+
+		// Otherwise, return the default queue
+		return getQueue();
+	}
+
+	/**
+	 * Find an item's appropriate queue and add it
+	 */
+	queue(): void {
+		this.#$queue.push(this);
 	}
 }
 

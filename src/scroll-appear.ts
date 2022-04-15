@@ -7,14 +7,12 @@ import { selectors } from './domMap.js';
 import { ScrollAppearState } from './ScrollAppearState.js';
 
 import { getScrollAppearItem } from './ScrollAppearItem.js';
-import { ScrollAppearQueue } from './ScrollAppearQueue.js';
+import { getAllQueues } from './queues.js';
 
 // TODO: Improve initialisation/default styles so there is never an initial flash, without compromising no-js functionality
 
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
 const delay = 100;
-
-const queue = new ScrollAppearQueue();
 
 /**
  * Initialise ScrollAppear for a particular set of elements
@@ -81,12 +79,16 @@ function _queueElementsInViewport(): void {
 
 	const hiddenItemsInViewport = hiddenItems.filter((item) => item.isInViewport());
 
-	hiddenItemsInViewport.forEach((item) => queue.push(item));
+	hiddenItemsInViewport.forEach((item) => item.queue());
 }
 
 /**
- * Tell the queue to "catch up" with the viewport
+ * Tell the queues to "catch up" with the viewport
  */
 function _catchUpQueue(): void {
-	queue.catchUp();
+	const queues = getAllQueues();
+
+	for (const queue of queues) {
+		queue.catchUp();
+	}
 }
