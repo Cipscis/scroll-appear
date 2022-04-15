@@ -9,6 +9,9 @@
   grid-gap: 20px;
   max-width: 580px;
 }
+.example__grid + .example__grid {
+  margin-top: 20px;
+}
 
 .example {
   display: flex;
@@ -18,6 +21,12 @@
   aspect-ratio: 1/1;
   background: red;
   color: white;
+}
+.js-scroll-appear__container .example {
+  background: blue;
+}
+.example[data-scroll-appear-queue=example-queue] {
+  background: green;
 }
 .example[data-scroll-appear-state=visible] {
   transition: all 0.3s ease-in-out;

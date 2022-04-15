@@ -8,15 +8,25 @@ import { ScrollAppearState } from './ScrollAppearState.js';
 export declare function getScrollAppearItem($element: Element): ScrollAppearItem;
 declare class ScrollAppearItem {
     #private;
-    delay: number;
     constructor($element: Element);
+    get delay(): number;
     /**
      * Checks if a `ScrollAppearItem`'s `Element` is in the viewport.
      * Only checks vertical boundaries, not horizontal.
      */
     isInViewport(threshold?: number): boolean;
+    /**
+     * Make an element appear
+     */
     appear(): void;
+    /**
+     * Query the DOM to retrieve the current `ScrollAppearState`
+     */
     getState(): ScrollAppearState;
+    /**
+     * Find an item's appropriate queue and add it
+     */
+    queue(): void;
 }
 declare type ScrollAppearItemType = InstanceType<typeof ScrollAppearItem>;
 export { ScrollAppearItemType as ScrollAppearItem };

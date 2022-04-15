@@ -4,6 +4,9 @@
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 	grid-gap: 20px;
+	+ .example__grid {
+		margin-top: 20px;
+	}
 
 	max-width: 580px;
 }
@@ -17,6 +20,12 @@
 	aspect-ratio: 1 / 1;
 
 	background: red;
+	.js-scroll-appear__container & {
+		background: blue;
+	}
+	&[data-scroll-appear-queue="example-queue"] {
+		background: green;
+	}
 	color: white;
 
 	@include scroll-appear {
