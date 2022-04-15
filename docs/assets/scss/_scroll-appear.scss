@@ -9,6 +9,8 @@
 	}
 
 	&[data-scroll-appear-state="hidden"] {
-		@content;
+		@media (prefers-reduced-motion: no-preference) {
+			@content;
+		}
 	}
 }
