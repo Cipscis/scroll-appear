@@ -4,6 +4,7 @@
 }
 
 .example__grid {
+  margin-top: 100px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   grid-gap: 20px;
@@ -22,12 +23,6 @@
   background: red;
   color: white;
 }
-.js-scroll-appear__container .example {
-  background: blue;
-}
-.example[data-scroll-appear-queue=example-queue] {
-  background: green;
-}
 .example[data-scroll-appear-state=appearing] {
   transition: all 0.3s ease-in-out;
 }
@@ -36,7 +31,48 @@
     transition: none;
   }
 }
-.example[data-scroll-appear-state=hidden] {
-  opacity: 0;
-  transform: translateY(100px);
+@media (prefers-reduced-motion: no-preference) {
+  .example[data-scroll-appear-state=hidden] {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+}
+.js-scroll-appear__container .example {
+  background: blue;
+  perspective: 999px;
+  backface-visibility: hidden;
+}
+.js-scroll-appear__container .example[data-scroll-appear-state=appearing] {
+  transition: all 1s ease-in-out;
+}
+@media (prefers-reduced-motion) {
+  .js-scroll-appear__container .example[data-scroll-appear-state=appearing] {
+    transition: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js-scroll-appear__container .example[data-scroll-appear-state=hidden] {
+    opacity: 1;
+    transform: rotateY(90deg);
+  }
+}
+.example[data-scroll-appear-queue=example-queue] {
+  background: green;
+}
+.example[data-scroll-appear-queue=example-queue][data-scroll-appear-state=appearing] {
+  transition: all 0.5s linear;
+}
+@media (prefers-reduced-motion) {
+  .example[data-scroll-appear-queue=example-queue][data-scroll-appear-state=appearing] {
+    transition: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .example[data-scroll-appear-queue=example-queue][data-scroll-appear-state=hidden] {
+    opacity: 1;
+    transform: scale(0);
+  }
+}
+.example::before {
+  content: attr(data-scroll-appear-delay);
 }
