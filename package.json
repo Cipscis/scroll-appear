@@ -1,12 +1,13 @@
 {
 	"name": "@cipscis/scroll-appear",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "A package for making elements appear as they scroll into view.",
 	"private": true,
 	"browser": "./dist/scroll-appear.js",
 	"type": "module",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"_scroll-appear.scss"
 	],
 	"types": "dist/scroll-appear.d.ts",
 	"scripts": {

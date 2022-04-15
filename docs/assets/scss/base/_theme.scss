@@ -1,0 +1,80 @@
+$white: #fff;
+$grey--lightest: #eee;
+$grey--lighter: #ccc;
+$grey--light: #999;
+$grey: #666;
+$grey--mid: #444;
+$grey--dark: #333;
+$black: #000;
+
+$blue--pale: darken(#def, 10%);
+$blue--dim: darken($blue--pale, 40%);
+
+$red--pale: #fee;
+
+$base-font-family: "Roboto Slab", "Times New Roman", Times, serif;
+$heading-font-family: "Roboto", Arial, sans-serif;
+
+@mixin light-mode {
+	--primary-background: #{$white};
+	--primary-background-active: #{darken($white, 5)};
+	--primary-color: #{$grey--dark};
+
+	--shadow: #{rgba($black, 0.4)};
+
+	--offset-background: #{$grey--lightest};
+	--offset-color: var(--primary-color);
+
+	--border: #{$grey--light};
+
+	--highlight-bar: #{$blue--pale};
+	--highlight-bar-active: #{darken($blue--pale, 10)};
+}
+
+@mixin dark-mode {
+	--primary-background: #{$grey--dark};
+	--primary-background-active: #{lighten($grey--dark, 5)};
+	--primary-color: #{$grey--lightest};
+
+	--shadow: #{rgba($white, 0.4)};
+
+	--offset-background: #{$grey};
+	--offset-color: var(--primary-color);
+
+	--border: #{$grey--lighter};
+
+	--highlight-bar: #{$blue--dim};
+	--highlight-bar-active: #{lighten($blue--dim, 10)};
+}
+
+@mixin contrast($background, $color: null, $active: null) {
+	background: $background;
+
+	@if ($color) {
+		color: $color;
+	}
+
+	@if ($active) {
+		&:hover,
+		&:focus {
+			background: $active;
+		}
+		&:focus-within {
+			background: $active;
+		}
+	}
+}
+
+@mixin contrast-primary {
+	@include contrast(
+		var(--primary-background),
+		var(--primary-color)
+	);
+}
+
+@mixin contrast-offset {
+	@include contrast(
+		var(--offset-background),
+		var(--offset-color)
+	);
+}

@@ -95,6 +95,7 @@ const buildSass = function () {
 
 const watchSass = function () {
 	gulp.watch(cssSrcFiles, buildSass);
+	gulp.watch('./src/**/*.scss', buildSass);
 };
 
 //////////////////

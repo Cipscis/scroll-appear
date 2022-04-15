@@ -11,8 +11,6 @@ import {
 } from './ScrollAppearItem.js';
 import { getAllQueues } from './queues.js';
 
-// TODO: Improve initialisation/default styles so there is never an initial flash, without compromising no-js functionality
-
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
 const delay = 200;
 
