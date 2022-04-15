@@ -32,17 +32,23 @@ export class ScrollAppearQueue {
 	 * Immediately show any items that have left the viewport
 	 */
 	catchUp(): void {
-		for (const [i, item] of this.items.entries()) {
+		for (let i = 0; i < this.items.length; i++) {
+			const item = this.items[i];
+
 			if (item.isInViewport() === false) {
 				if (i === 0) {
-					// If the first item should appear, make it appear like normal
+					// If the first item should appepar, make it appear like normal
 					this.#appearFirstItem();
 				} else {
 					// If a later item should appear immediately, remove it from
 					// the queue and make it appear immediately
-					this.items.splice(i, 1);
+					this.#items.splice(i, 1);
 					item.appear();
 				}
+
+				// Either way, the item was removed from the list,
+				// so decrement `i` to make sure we don't miss an item
+				i -= 1;
 			}
 		}
 	}
