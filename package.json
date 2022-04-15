@@ -42,7 +42,6 @@
 		"node": ">=14"
 	},
 	"dependencies": {
-		"@cipscis/debounce": "^2.0.0",
-		"@cipscis/throttle": "^2.0.0"
+		"@cipscis/throttle-with-debounce": "^1.0.0"
 	}
 }

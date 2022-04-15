@@ -1,5 +1,4 @@
-import { throttle } from '@cipscis/throttle';
-import { debounce } from '@cipscis/debounce';
+import { throttleWithDebounce } from '@cipscis/throttle-with-debounce';
 
 import passiveSupported from './eventListenerPassiveSupport.js';
 
@@ -49,24 +48,15 @@ function _initElement($element: Element): void {
 function _initEvents(): void {
 	const passiveOptions = passiveSupported ? { passive: true } : true;
 
-	// TODO: Bind events in a way that prevents a single scroll or resize event from firing the handler twice
-	const throttledShow = throttle(_queueElementsInViewport, delay);
-	const debouncedShow = debounce(_queueElementsInViewport, delay);
+	const throttledShow = throttleWithDebounce(_queueElementsInViewport, delay);
 
 	window.addEventListener('scroll', throttledShow, passiveOptions);
-	window.addEventListener('scroll', debouncedShow, passiveOptions);
-
 	window.addEventListener('resize', throttledShow, passiveOptions);
-	window.addEventListener('resize', debouncedShow, passiveOptions);
 
-	const throttledCatchUp = throttle(_catchUpQueue, delay);
-	const debouncedCatchUp = debounce(_catchUpQueue, delay);
+	const throttledCatchUp = throttleWithDebounce(_catchUpQueue, delay);
 
 	window.addEventListener('scroll', throttledCatchUp, passiveOptions);
-	window.addEventListener('scroll', debouncedCatchUp, passiveOptions);
-
 	window.addEventListener('resize', throttledCatchUp, passiveOptions);
-	window.addEventListener('resize', debouncedCatchUp, passiveOptions);
 }
 
 /**
