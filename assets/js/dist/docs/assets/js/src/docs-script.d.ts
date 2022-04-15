@@ -1,1 +1,1 @@
-export {};
+import '@cipscis/scroll-appear';

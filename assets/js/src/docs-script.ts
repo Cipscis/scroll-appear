@@ -1,3 +1,1 @@
-import { init } from '@cipscis/scroll-appear';
-
-init();
+import '@cipscis/scroll-appear';
