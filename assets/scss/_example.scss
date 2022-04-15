@@ -21,14 +21,16 @@
 	width: 100%;
 	aspect-ratio: 1 / 1;
 
-	background: red;
+	@include contrast-offset;
+	border: 5px solid transparent;
+	border-color: red;
 	@include scroll-appear {
 		opacity: 0;
 		transform: translateY(100px);
 	}
 
 	.js-scroll-appear__container & {
-		background: blue;
+		border-color: blue;
 		perspective: 999px;
 		backface-visibility: hidden;
 		@include scroll-appear(1s) {
@@ -37,13 +39,12 @@
 		}
 	}
 	&[data-scroll-appear-queue="example-queue"] {
-		background: green;
+		border-color: green;
 		@include scroll-appear(0.5s, linear) {
 			opacity: 1;
 			transform: scale(0);
 		}
 	}
-	color: white;
 
 	&::before {
 		content: attr(data-scroll-appear-delay);

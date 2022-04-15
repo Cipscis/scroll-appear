@@ -7,7 +7,9 @@
 	<link rel="stylesheet" href="/scroll-appear/assets/css/main.css" />
 	<script type="module" src="/scroll-appear/assets/js/dist/docs-script.bundle.js"></script>
 </head>
-<body>
+<body class="no-js">
+	<script type="text/javascript">document.body.classList.remove('no-js');</script>
+
 	<main class="layout">
 		<section>
 			<div class="content">
@@ -75,6 +77,20 @@
 
 					<p>Accessibility is built into this mixin by having it respect the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion" target="_blank">prefers-reduced-motion</a> media query. So users who prefer reduced motion will not have these elements animate in for them.</p>
 				</div>
+
+				<section>
+					<div class="content">
+						<h4 id="usage-scss-no-javascript">No JavaScript</h4>
+
+						<p>In the event that someone loads your page without JavaScript, you will want to ensure these elements are all visible by default. To allow this level of support, the <code>scroll-appear</code> SCSS mixin is set up so that its contents won't apply if the <code>body</code> element has the CSS class <code>no-js</code>.</p>
+
+						<p>This is a common pattern, used by frameworks such as <a href="https://modernizr.com/" target="_blank">Modernizr</a>, to detect in CSS whether or not a page has JavaScript enabled. You can set this support up by adding the <code>no-js</code> class to your <code>body</code> tag and inserting this inline script to remove it as its very first child:</p>
+
+						<code class="code--block">document.body.classList.remove('no-js');</code>
+
+						<p>It's also common to replace it with another class, such as <code>js</code>, but Scroll Appear only looks for a <code>no-js</code> class.</p>
+					</div>
+				</div>
 			</section>
 
 			<section>
@@ -122,7 +138,7 @@
 
 				<p>These example squares have different delay times and belong to different queues. They are colour-coded according to which queue they belong to, and their content is the length of their delay.</p>
 
-				<p>They have <code>tabindex="0"</code> so you can tab through them and see how they appear immediately when they receive keyboard focus. Because they are faded out but have <code>display</code> and <code>visibility</code> modes that mean they are technically visible, you can also click on them to make them appear.</p>
+				<p>They have <code>tabindex="0"</code> so you can <kbd>Tab</kbd> through them and see how they appear immediately when they receive keyboard focus. Because they are faded out but have <code>display</code> and <code>visibility</code> modes that mean they are technically visible, you can also click on them to make them appear.</p>
 
 				<p>The last item is added to the DOM after Scroll Appear was initialised.</p>
 			</div>

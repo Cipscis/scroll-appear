@@ -1,0 +1,22 @@
+:root {
+	@include light-mode;
+
+	@media (prefers-color-scheme: dark) {
+		@include dark-mode;
+	}
+}
+
+.light-mode {
+	@include light-mode;
+}
+
+.dark-mode {
+	@include dark-mode;
+}
+
+
+body,
+.light-mode,
+.dark-mode {
+	@include contrast-primary;
+}
