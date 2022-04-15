@@ -62,6 +62,10 @@
 
 					<p>Scroll Appear contains a SCSS file that exposes a <a href="https://sass-lang.com/documentation/at-rules/mixin" target="_blank">mixin</a> to make it easier to set up the CSS transition used when they appear. The idea behind it is that you should specify the hidden state of the element, and allow it to transition to its default state.</p>
 
+					<p>You can import this mixin from the installed Node.js package. The relative path will depend on how your project is organised, but for example:</p>
+
+					<code class="code--block">@import "../../../../node_modules/@cipscis/scroll-appear/scroll-appear";</code>
+
 					<p>For example, this CSS sets a hidden element to be faded out and offset to the bottom, so when it transitions to its default state it will fade in and slide up:</p>
 
 					<code class="code--block">.appearing-element {
