@@ -4,7 +4,7 @@ import { debounce } from '@cipscis/debounce';
 import passiveSupported from './eventListenerPassiveSupport.js';
 
 import { selectors } from './domMap.js';
-import { ScrollAppearState } from "./ScrollAppearState.js";
+import { ScrollAppearState } from './ScrollAppearState.js';
 
 import { getScrollAppearItem } from './ScrollAppearItem.js';
 import { ScrollAppearQueue } from './ScrollAppearQueue.js';

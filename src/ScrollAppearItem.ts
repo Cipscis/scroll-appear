@@ -36,6 +36,9 @@ class ScrollAppearItem {
 		if (this.getState() === ScrollAppearState.UNINITIALISED) {
 			this.#setState(ScrollAppearState.HIDDEN);
 		}
+
+		// Make this item appear as soon as it or any of its descendents receive focus
+		this.#$element.addEventListener('focusin', () => this.appear(), { once: true });
 	}
 
 	/**

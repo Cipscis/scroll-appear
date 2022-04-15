@@ -104,7 +104,12 @@ export class ScrollAppearQueue {
 		}
 		this.#timeout = null;
 
-		const firstItem = this.#items.shift();
+		let firstItem = this.#items.shift();
+
+		// If the first item has appeared already, try the next one
+		while (firstItem?.getState() === ScrollAppearState.VISIBLE) {
+			firstItem = this.#items.shift();
+		}
 
 		if (firstItem) {
 			firstItem.appear();
