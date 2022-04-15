@@ -5,21 +5,30 @@ import passiveSupported from './eventListenerPassiveSupport.js';
 import { selectors } from './domMap.js';
 import { ScrollAppearState } from './ScrollAppearState.js';
 
-import { getScrollAppearItem } from './ScrollAppearItem.js';
+import {
+	ScrollAppearItem,
+	getScrollAppearItem,
+} from './ScrollAppearItem.js';
 import { getAllQueues } from './queues.js';
 
 // TODO: Improve initialisation/default styles so there is never an initial flash, without compromising no-js functionality
-// TODO: Detect when new elements are added to the page and initialise them if necessary
 
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
-const delay = 100;
+const delay = 200;
+
+/**
+ * This `MutationObserver` watches for any new elements added to the page,
+ * and if it finds any then it initialises any `ScrollAppearItem` elements.
+ */
+const observer = new MutationObserver(_checkNewElements);
 
 /**
  * Initialise ScrollAppear items and functionality
  */
 function init(): void {
-	_queueElementsInViewport();
+	_initAndQueueItems();
 	_initEvents();
+	_initObserver();
 }
 
 /**
@@ -29,7 +38,7 @@ function init(): void {
 function _initEvents(): void {
 	const passiveOptions = passiveSupported ? { passive: true } : true;
 
-	const throttledShow = throttleWithDebounce(_queueElementsInViewport, delay);
+	const throttledShow = throttleWithDebounce(_initAndQueueItemsEvent, delay);
 
 	window.addEventListener('scroll', throttledShow, passiveOptions);
 	window.addEventListener('resize', throttledShow, passiveOptions);
@@ -41,12 +50,70 @@ function _initEvents(): void {
 }
 
 /**
- * Add all hidden elements in the viewport to the relevant queue
- * As a side effect, this also initialises all elements
+ * Tell `observer` to start watching the entire DOM for `Node` insertion
  */
-function _queueElementsInViewport(): void {
-	const $elements = Array.from(document.querySelectorAll(selectors.item));
-	const items = $elements.map(getScrollAppearItem);
+function _initObserver(): void {
+	observer.observe(document, {
+		childList: true,
+		subtree: true,
+	});
+}
+
+/**
+ * If any new `Element`s have been added, initialise any new `ScrollAppearItem`
+ */
+function _checkNewElements(mutations: MutationRecord[], oberver: MutationObserver): void {
+	let nodesAdded = false;
+
+	for (const mutation of mutations) {
+		if (mutation.addedNodes.length > 0) {
+			nodesAdded = true;
+			break;
+		}
+	}
+
+	if (nodesAdded === true) {
+		const $newElements = document.querySelectorAll(selectors.newItem);
+		if ($newElements.length > 0) {
+			_initAndQueueItems($newElements);
+		}
+	}
+}
+
+/**
+ * Initialise all items, optionally limited to a set of elements,
+ * then queue all of them that are currently in the viewport
+ */
+function _initAndQueueItems($elements?: ArrayLike<Element>): void {
+	const items = _initElements($elements);
+	_queueHiddenItemsInViewport(items);
+}
+
+/**
+ * A variation of `_initAndQueueItems` meant to be bound to events
+ */
+function _initAndQueueItemsEvent(e: Event): void {
+	_initAndQueueItems();
+}
+
+/**
+ * Retrieve the `ScrollAppearItem` for each `Element`. If they don't
+ * already have a `ScrollAppearItem`, creating one will initialise them
+ */
+function _initElements($elements?: ArrayLike<Element>): ScrollAppearItem[] {
+	if (!$elements) {
+		$elements = document.querySelectorAll(selectors.item);
+	}
+
+	const items = Array.from($elements).map(getScrollAppearItem);
+
+	return items;
+}
+
+/**
+ * For each hidden item in the viewport, add it to the appropriate queue
+ */
+function _queueHiddenItemsInViewport(items: ScrollAppearItem[]): void {
 	const hiddenItems = items.filter((item) => item.getState() === ScrollAppearState.HIDDEN);
 
 	const hiddenItemsInViewport = hiddenItems.filter((item) => item.isInViewport());

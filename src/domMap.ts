@@ -3,6 +3,7 @@
 
 export const selectors = {
 	item: '.js-scroll-appear',
+	newItem: '.js-scroll-appear:not([data-scroll-appear-state])',
 	container: '.js-scroll-appear__container',
 } as const;
 
