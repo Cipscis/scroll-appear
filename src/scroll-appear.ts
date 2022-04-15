@@ -9,36 +9,17 @@ import { getScrollAppearItem } from './ScrollAppearItem.js';
 import { getAllQueues } from './queues.js';
 
 // TODO: Improve initialisation/default styles so there is never an initial flash, without compromising no-js functionality
+// TODO: Detect when new elements are added to the page and initialise them if necessary
 
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
 const delay = 100;
 
 /**
- * Initialise ScrollAppear for a particular set of elements
+ * Initialise ScrollAppear items and functionality
  */
-export function init($container: Element | Document = document): void {
-	_initElements($container);
-
-	_initEvents();
-}
-
-/**
- * Find all scroll appear elements and initialise them. Then, show any elements within the viewport
- */
-function _initElements($container: Element | Document = document): void {
-	const $elements = Array.from($container.querySelectorAll(selectors.item));
-
-	$elements.forEach(_initElement);
-
+function init(): void {
 	_queueElementsInViewport();
-}
-
-/**
- * Create a `ScrollAppearItem` for an `Element`, letting its constructor perform the necessary initialisation.
- * We can retrieve the same `ScrollAppearItem` later, so we don't need to remember it now.
- */
-function _initElement($element: Element): void {
-	getScrollAppearItem($element);
+	_initEvents();
 }
 
 /**
@@ -60,7 +41,8 @@ function _initEvents(): void {
 }
 
 /**
- * Add all hidden elements in the viewport to the queue
+ * Add all hidden elements in the viewport to the relevant queue
+ * As a side effect, this also initialises all elements
  */
 function _queueElementsInViewport(): void {
 	const $elements = Array.from(document.querySelectorAll(selectors.item));
@@ -82,3 +64,6 @@ function _catchUpQueue(): void {
 		queue.catchUp();
 	}
 }
+
+// Self-initialise
+init();
