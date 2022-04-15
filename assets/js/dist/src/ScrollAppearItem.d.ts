@@ -1,4 +1,4 @@
-import { ScrollAppearState } from './constants.js';
+import { ScrollAppearState } from './ScrollAppearState.js';
 /**
  * Create or retrieve a `ScrollAppearItem` for a specified `Element`.
  * This function should be used in place of the `ScrollAppearItem` constructor,
@@ -10,7 +10,11 @@ declare class ScrollAppearItem {
     #private;
     delay: number;
     constructor($element: Element);
-    isInViewport(): boolean;
+    /**
+     * Checks if a `ScrollAppearItem`'s `Element` is in the viewport.
+     * Only checks vertical boundaries, not horizontal.
+     */
+    isInViewport(threshold?: number): boolean;
     appear(): void;
     getState(): ScrollAppearState;
 }

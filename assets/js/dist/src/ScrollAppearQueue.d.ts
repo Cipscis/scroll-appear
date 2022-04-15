@@ -1,8 +1,6 @@
 import { ScrollAppearItem } from './ScrollAppearItem.js';
 export declare class ScrollAppearQueue {
     #private;
-    items: ScrollAppearItem[];
-    timeout: ReturnType<typeof setTimeout> | null;
     constructor();
     /**
      * Add a new item to the end of the queue if it's not in there already
