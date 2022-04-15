@@ -85,6 +85,10 @@ class ScrollAppearItem {
 	 * Make an element appear
 	 */
 	appear(): void {
+		if (this.getState() === ScrollAppearState.VISIBLE) {
+			return;
+		}
+
 		if (matchMedia('(prefers-reduced-motion)').matches) {
 			// Don't bother with the intermediate `APPEARING` state if the user prefers reduced motion
 			this.#setState(ScrollAppearState.VISIBLE);
