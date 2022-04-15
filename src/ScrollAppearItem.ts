@@ -85,7 +85,20 @@ class ScrollAppearItem {
 	 * Make an element appear
 	 */
 	appear(): void {
-		this.#setState(ScrollAppearState.VISIBLE);
+		if (matchMedia('(prefers-reduced-motion)').matches) {
+			// Don't bother with the intermediate `APPEARING` state if the user prefers reduced motion
+			this.#setState(ScrollAppearState.VISIBLE);
+		} else {
+			this.#setState(ScrollAppearState.APPEARING);
+
+			if (getComputedStyle(this.#$element).transitionDuration !== '0s') {
+				// If the `APPEARING` state has a transition duration, update the state when the transition ends
+				this.#$element.addEventListener('transitionend', () => this.#setState(ScrollAppearState.VISIBLE), { once: true });
+			} else {
+				// Otherwise, update the state immediately
+				this.#setState(ScrollAppearState.VISIBLE);
+			}
+		}
 	}
 
 	/**

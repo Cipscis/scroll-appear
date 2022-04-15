@@ -1,6 +1,6 @@
 @mixin scroll-appear($duration: 0.3s, $easing: ease-in-out) {
-	&[data-scroll-appear-state="visible"] {
-		// TODO: Set up proper transitions
+	&[data-scroll-appear-state="appearing"] {
+		// This transition only applies for the duration of the element's appearance
 		transition: all $duration $easing;
 
 		@media (prefers-reduced-motion) {

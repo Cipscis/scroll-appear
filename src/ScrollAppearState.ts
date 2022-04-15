@@ -1,6 +1,7 @@
 export enum ScrollAppearState {
 	UNINITIALISED = 'uninitialised',
 	HIDDEN = 'hidden',
+	APPEARING = 'appearing',
 	VISIBLE = 'visible'
 }
 
