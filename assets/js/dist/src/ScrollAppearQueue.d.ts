@@ -1,19 +1,15 @@
-interface ScrollAppearQueueItem {
-    $element: Element;
-    delay: number;
-}
+import { ScrollAppearItem } from './ScrollAppearItem.js';
 export declare class ScrollAppearQueue {
     #private;
-    constructor();
-    items: ScrollAppearQueueItem[];
+    items: ScrollAppearItem[];
     timeout: ReturnType<typeof setTimeout> | null;
+    constructor();
     /**
-     * Add an item to the end of the queue if it's not in there already
+     * Add a new item to the end of the queue if it's not in there already
      */
-    push($element: Element): void;
+    push(item: ScrollAppearItem): void;
     /**
-     * Immediately show any elements that have left the viewport
+     * Immediately show any items that have left the viewport
      */
     catchUp(): void;
 }
-export {};
