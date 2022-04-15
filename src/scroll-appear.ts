@@ -3,7 +3,8 @@ import { debounce } from '@cipscis/debounce';
 
 import passiveSupported from './eventListenerPassiveSupport.js';
 
-import { selectors } from './constants.js';
+import { selectors } from './domMap.js';
+import { ScrollAppearState } from "./ScrollAppearState.js";
 
 import { getScrollAppearItem } from './ScrollAppearItem.js';
 import { ScrollAppearQueue } from './ScrollAppearQueue.js';
@@ -28,9 +29,9 @@ export function init($container: Element | Document = document): void {
  * Find all scroll appear elements and initialise them. Then, show any elements within the viewport
  */
 function _initElements($container: Element | Document = document): void {
-	const $uninitialisedElements = Array.from($container.querySelectorAll(selectors.uninitialised));
+	const $elements = Array.from($container.querySelectorAll(selectors.item));
 
-	$uninitialisedElements.forEach(_initElement);
+	$elements.forEach(_initElement);
 
 	_queueElementsInViewport();
 }
@@ -73,8 +74,9 @@ function _initEvents(): void {
  * Add all hidden elements in the viewport to the queue
  */
 function _queueElementsInViewport(): void {
-	const $hiddenElements = Array.from(document.querySelectorAll(selectors.hidden));
-	const hiddenItems = $hiddenElements.map(getScrollAppearItem);
+	const $elements = Array.from(document.querySelectorAll(selectors.item));
+	const items = $elements.map(getScrollAppearItem);
+	const hiddenItems = items.filter((item) => item.getState() === ScrollAppearState.HIDDEN);
 
 	const hiddenItemsInViewport = hiddenItems.filter((item) => item.isInViewport());
 

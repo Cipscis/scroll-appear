@@ -1,4 +1,4 @@
-import { ScrollAppearState } from './constants.js';
+import { ScrollAppearState } from './ScrollAppearState.js';
 import { ScrollAppearItem } from './ScrollAppearItem.js';
 
 // TODO: Make the first item appear immediately, so its delay affects the item after it instead

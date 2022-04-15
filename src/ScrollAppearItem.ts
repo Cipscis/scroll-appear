@@ -1,9 +1,6 @@
-import {
-	ScrollAppearState,
-	isScrollAppearState,
-
-	dataAttributes,
-} from './constants.js';
+import { isScrollAppearState } from './ScrollAppearState.js';
+import { attributes } from './domMap.js';
+import { ScrollAppearState } from './ScrollAppearState.js';
 
 import { isElementInViewport } from './viewport.js';
 
@@ -36,7 +33,7 @@ class ScrollAppearItem {
 		}
 
 		this.#$element = $element;
-		this.delay = Number($element.getAttribute(dataAttributes.delay)) || 0;
+		this.delay = Number($element.getAttribute(attributes.delay)) || 0;
 
 		if (this.getState() === ScrollAppearState.UNINITIALISED) {
 			this.#setState(ScrollAppearState.HIDDEN);
@@ -52,11 +49,11 @@ class ScrollAppearItem {
 	}
 
 	#setState(state: ScrollAppearState): void {
-		this.#$element.setAttribute(dataAttributes.state, state);
+		this.#$element.setAttribute(attributes.state, state);
 	}
 
 	getState(): ScrollAppearState {
-		const state = this.#$element.getAttribute(dataAttributes.state);
+		const state = this.#$element.getAttribute(attributes.state);
 
 		if (isScrollAppearState(state)) {
 			return state;
