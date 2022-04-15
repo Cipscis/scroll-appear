@@ -1,84 +1,76 @@
-import { dataAttributes } from './constants.js';
-import { showElement } from './elements.js';
-import { isElementInViewport } from './viewport.js';
-
-interface ScrollAppearQueueItem {
-	$element: Element,
-	delay: number,
-}
+import { ScrollAppearState } from './constants.js';
+import { ScrollAppearItem } from './ScrollAppearItem.js';
 
 // TODO: Make the first item appear immediately, so its delay affects the item after it instead
 // TODO: Allow for multiple queues, based either on an ID in a data attribute or a containing element
 
 export class ScrollAppearQueue {
+	items: ScrollAppearItem[];
+	timeout: ReturnType<typeof setTimeout> | null;
+
 	constructor() {
 		this.items = [];
 		this.timeout = null;
 	}
 
-	items: ScrollAppearQueueItem[];
-
-	timeout: ReturnType<typeof setTimeout> | null;
-
 	/**
-	 * Add an item to the end of the queue if it's not in there already
+	 * Add a new item to the end of the queue if it's not in there already
 	 */
-	push($element: Element): void {
-		if (this.#isInQueue($element)) {
+	push(item: ScrollAppearItem): void {
+		if (this.#isInQueue(item)) {
 			return;
 		}
 
-		const delay = Number($element.getAttribute(dataAttributes.delay)) || 0;
-
-		const item: ScrollAppearQueueItem = {
-			$element,
-			delay,
-		};
-
-		this.items.push(item);
-		this.#scheduleExecution();
+		// If the item is hidden, add it to the queue and schedule its appearance
+		if (item.getState() === ScrollAppearState.HIDDEN) {
+			this.items.push(item);
+			this.#scheduleAppearance();
+		}
 	}
 
 	/**
-	 * Immediately show any elements that have left the viewport
+	 * Immediately show any items that have left the viewport
 	 */
 	catchUp(): void {
 		for (const [i, item] of this.items.entries()) {
-			if (isElementInViewport(item.$element) === false) {
+			if (item.isInViewport() === false) {
 				if (i === 0) {
-					this.#execute();
+					// If the first item should appear, make it appear like normal
+					this.#appearFirstItem();
 				} else {
+					// If a later item should appear immediately, remove it from
+					// the queue and make it appear immediately
 					this.items.splice(i, 1);
-					showElement(item.$element);
+					item.appear();
 				}
 			}
 		}
 	}
 
 	/**
-	 * Checks if an element is already in the queue
+	 * Checks if an item is already in the queue
 	 */
-	#isInQueue($element: Element): boolean {
-		const item = this.items.find((item) => item.$element === $element);
+	#isInQueue(item: ScrollAppearItem): boolean {
+		const inQueue = this.items.find((queueItem) => queueItem === item);
 
-		return !!item;
+		return !!inQueue;
 	}
 
 	/**
-	 * Schedule the execution of the first item in the queue
+	 * Schedule the appearance of the first item in the queue
 	 */
-	#scheduleExecution(): void {
+	#scheduleAppearance(): void {
 		const nextItem = this.items[0];
 
 		if (nextItem && this.timeout === null) {
-			this.timeout = setTimeout(() => this.#execute(), nextItem.delay);
+			this.timeout = setTimeout(() => this.#appearFirstItem(), nextItem.delay);
 		}
 	}
 
 	/**
 	 * Make the first item in the queue appear
 	 */
-	#execute(): void {
+	#appearFirstItem(): void {
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -87,8 +79,8 @@ export class ScrollAppearQueue {
 		const nextItem = this.items.shift();
 
 		if (nextItem) {
-			showElement(nextItem.$element);
-			this.#scheduleExecution();
+			nextItem.appear();
+			this.#scheduleAppearance();
 		}
 	}
 }

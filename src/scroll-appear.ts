@@ -4,10 +4,11 @@ import { debounce } from '@cipscis/debounce';
 import passiveSupported from './eventListenerPassiveSupport.js';
 
 import { selectors } from './constants.js';
-import { hideElement } from './elements.js';
-import { isElementInViewport } from './viewport.js';
 
+import { getScrollAppearItem } from './ScrollAppearItem.js';
 import { ScrollAppearQueue } from './ScrollAppearQueue.js';
+
+// TODO: Improve initialisation/default styles so there is never an initial flash, without compromising no-js functionality
 
 /** (milliseconds) Throttle/debounce delay for scroll and resize events */
 const delay = 100;
@@ -24,14 +25,22 @@ export function init($container: Element | Document = document): void {
 }
 
 /**
- * Find all elements and hide them. Then, show any elements within the viewport
+ * Find all scroll appear elements and initialise them. Then, show any elements within the viewport
  */
 function _initElements($container: Element | Document = document): void {
-	const $elements = $container.querySelectorAll(selectors.uninitialised);
+	const $uninitialisedElements = Array.from($container.querySelectorAll(selectors.uninitialised));
 
-	$elements.forEach(hideElement);
+	$uninitialisedElements.forEach(_initElement);
 
 	_queueElementsInViewport();
+}
+
+/**
+ * Create a `ScrollAppearItem` for an `Element`, letting its constructor perform the necessary initialisation.
+ * We can retrieve the same `ScrollAppearItem` later, so we don't need to remember it now.
+ */
+function _initElement($element: Element): void {
+	getScrollAppearItem($element);
 }
 
 /**
@@ -64,11 +73,12 @@ function _initEvents(): void {
  * Add all hidden elements in the viewport to the queue
  */
 function _queueElementsInViewport(): void {
-	const $hiddenElements = document.querySelectorAll(selectors.hidden);
+	const $hiddenElements = Array.from(document.querySelectorAll(selectors.hidden));
+	const hiddenItems = $hiddenElements.map(getScrollAppearItem);
 
-	const $hiddenElementsInViewport = Array.from($hiddenElements).filter(isElementInViewport);
+	const hiddenItemsInViewport = hiddenItems.filter((item) => item.isInViewport());
 
-	$hiddenElementsInViewport.forEach(($element) => queue.push($element));
+	hiddenItemsInViewport.forEach((item) => queue.push(item));
 }
 
 /**
