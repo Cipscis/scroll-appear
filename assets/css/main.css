@@ -28,11 +28,11 @@
 .example[data-scroll-appear-queue=example-queue] {
   background: green;
 }
-.example[data-scroll-appear-state=visible] {
+.example[data-scroll-appear-state=appearing] {
   transition: all 0.3s ease-in-out;
 }
 @media (prefers-reduced-motion) {
-  .example[data-scroll-appear-state=visible] {
+  .example[data-scroll-appear-state=appearing] {
     transition: none;
   }
 }
