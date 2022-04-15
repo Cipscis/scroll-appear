@@ -12,38 +12,148 @@
 		<section>
 			<div class="content">
 				<h1>Scroll Appear documentation</h1>
+
+				<p>Making elements appear on the page via an animation as the user scrolls down and they enter the viewport is a reasonably common design pattern, but it's often implemented in a way that neglects accessibility and relies on cumbersome JavaScript for its animation.</p>
+
+				<p>Scroll Appear is my attempt at implementing this pattern in a way that remains accessible and relies entirely on CSS for its appearance animations.</p>
+
+				<p>To accomplish this, Scroll Appear comes in two parts. The first is the JavaScript that handles the functionality of changing elements' states as they enter the viewport. The second is a SCSS mixin that makes it easy to implement these appearance animations in an accessible way.</p>
 			</div>
 		</section>
 
 		<section>
+			<div class="content">
+				<h2 id="installation">Installation</h2>
+
+				<p>Scroll Appear can be installed from npm:</p>
+
+				<code class="code--block">npm install @cipscis/scroll-appear --save</code>
+			</div>
+		</section>
+
+		<section>
+			<div class="content">
+				<h2 id="usage">Usage</h2>
+			</div>
+
+			<section>
+				<div class="content">
+					<h3 id="usage-javascript">JavaScript</h3>
+
+					<p>The JavaScript for Scroll Appear initialises itself, you just need to have it run on the page:</p>
+
+					<code class="code--block">import '@cipscis/scroll-appear';</code>
+
+					<p>This JavaScript looks for any element with a <code>js-scroll-appear</code> class on them, and will transition them from hidden, to appearing, to visible as they enter the viewport.</p>
+
+					<p>Any elements that are added to the page after Scroll Appear runs will be detected by a <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver" target="_blank">MutationObserver</a> and initialised in the same way.</p>
+
+					<p>Elements are <a href="#queues">queued</a> to appear when they first enter the viewport. If an element then leaves the viewport before it appears, it will appear immediately to allow the queue to "catch up" with the viewport.</p>
+
+					<p>Elements will also appear immediately if keyboard focus enters them.</p>
+				</div>
+			</section>
+
+			<section>
+				<div class="content">
+					<h3 id="usage-scss">SCSS</h3>
+
+					<p>Scroll Appear contains a SCSS file that exposes a <a href="https://sass-lang.com/documentation/at-rules/mixin" target="_blank">mixin</a> to make it easier to set up the CSS transition used when they appear. The idea behind it is that you should specify the hidden state of the element, and allow it to transition to its default state.</p>
+
+					<p>For example, this CSS sets a hidden element to be faded out and offset to the bottom, so when it transitions to its default state it will fade in and slide up:</p>
+
+					<code class="code--block">.appearing-element {
+	@include scroll-appear(0.5s, ease-in) {
+		opacity: 0;
+		transform: translateY(100px);
+	}
+}</code>
+
+					<p>The two arguments of the <code>scroll-appear</code> mixin are optional, to allow additional control of the duration and easing function of the transition. The default values are <code>0.3s</code> and <code>ease-in-out</code>.</p>
+
+					<p>It is <em>important</em> for accessibility that elements aren't given <code>display: none;</code> or <code>visibility: hidden;</code> within this mixin. They should still be able to be read by screen readers and receive focus from the keyboard even before Scroll Appear has told them to appear.</p>
+
+					<p>Accessibility is built into this mixin by having it respect the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion" target="_blank">prefers-reduced-motion</a> media query. So users who prefer reduced motion will not have these elements animate in for them.</p>
+				</div>
+			</section>
+
+			<section>
+				<div class="content">
+					<h3 id="usage-queues">Queues</h3>
+
+					<p>If an element is configured to <a href="#usage-configuration-delay">have a delay</a>, then the next element should not appear immediately. To accomplish this, elements are added to a queue when they enter the viewport. By default, all elements enter the same queue, but they can also be grouped in two different ways into other queues.</p>
+
+					<p>First, if an element has a <code>data-scroll-appear-queue</code> attribute, then it will enter the same queue as all other elements with the same attribute value.</p>
+
+					<p>Second, if an element is an ancestor of an element with the class <code>js-scroll-appear__container</code>, then it will enter a queue associated with that container.</p>
+
+					<p>Otherwise, an element will join the global queue instead.</p>
+				</div>
+			</section>
+
+			<section>
+				<div class="content">
+					<h3 id="usage-configuration">Configuration</h3>
+
+					<p>There are a few ways elements can be configured via data attributes:</p>
+				</div>
+
+				<section>
+					<div class="content">
+						<h4 id="usage-configuration-delay">Delay</h4>
+
+						<p>If an element has a number in a <code>data-scroll-appear-delay</code> attribute, the next element in its queue will wait that many milliseconds before appearing.</p>
+					</div>
+				</section>
+
+				<section>
+					<div class="content">
+						<h4 id="usage-configuration-queue">Queue</h4>
+
+						<p>If an element has a <code>data-scroll-appear-queue</code> attribute, it will belong to the same queue as all other elements with the same attribute value.</p>
+					</div>
+				</section>
+			</section>
+		</section>
+
+		<section>
+			<div class="content">
+				<h2 id="examples">Examples</h2>
+
+				<p>These example squares have different delay times and belong to different queues. They are colour-coded according to which queue they belong to, and their content is the length of their delay.</p>
+
+				<p>They have <code>tabindex="0"</code> so you can tab through them and see how they appear immediately when they receive keyboard focus. Because they are faded out but have <code>display</code> and <code>visibility</code> modes that mean they are technically visible, you can also click on them to make them appear.</p>
+
+				<p>The last item is added to the DOM after Scroll Appear was initialised.</p>
+			</div>
+
 			<div class="example__grid">
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
 			</div>
 
 			<div class="example__grid js-scroll-appear__container">
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600" data-scroll-appear-queue="example-queue"></div>
 			</div>
 
 			<div class="example__grid">
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="500">Example</div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="300"></div>
 
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
-				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="1000" data-scroll-appear-queue="example-queue">Example</div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600" data-scroll-appear-queue="example-queue"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600" data-scroll-appear-queue="example-queue"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600" data-scroll-appear-queue="example-queue"></div>
+				<div class="example js-scroll-appear" tabindex="0" data-scroll-appear-delay="600" data-scroll-appear-queue="example-queue"></div>
 			</div>
 		</section>
 	</main>
