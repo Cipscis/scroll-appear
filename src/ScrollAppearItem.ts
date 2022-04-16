@@ -27,8 +27,6 @@ export function getScrollAppearItem($element: Element): ScrollAppearItem {
 
 class ScrollAppearItem {
 	#$element: Element;
-	#$queue: ScrollAppearQueue;
-	#delay: number;
 
 	constructor($element: Element) {
 		if (scrollAppearItems.has($element)) {
@@ -38,19 +36,17 @@ class ScrollAppearItem {
 		}
 
 		this.#$element = $element;
-		this.#$queue = this.#findQueue();
-		this.#delay = Number($element.getAttribute(attributes.delay)) || 0;
 
 		if (this.getState() === ScrollAppearState.UNINITIALISED) {
 			this.#setState(ScrollAppearState.HIDDEN);
 		}
 
-		// Make this item appear as soon as it or any of its descendents receive focus
+		// Make this item appear as soon as it or any of its descendants receive focus
 		this.#$element.addEventListener('focusin', () => this.appear(), { once: true });
 	}
 
 	get delay(): number {
-		return this.#delay;
+		return Number(this.#$element.getAttribute(attributes.delay)) || 0;
 	}
 
 	/**
@@ -149,7 +145,9 @@ class ScrollAppearItem {
 	 * Find an item's appropriate queue and add it
 	 */
 	queue(): void {
-		this.#$queue.push(this);
+		const queue = this.#findQueue();
+
+		queue.push(this);
 	}
 }
 
