@@ -22,7 +22,13 @@ const scrollAppearItems: Map<Element, ScrollAppearItem> = new Map();
  * can only have a single `ScrollAppearItem` created for it.
  */
 export function getScrollAppearItem($element: Element): ScrollAppearItem {
-	return scrollAppearItems.get($element) || new ScrollAppearItem($element);
+	const existingItem = scrollAppearItems.get($element);
+	if (existingItem) {
+		return existingItem;
+	}
+
+	const newItem = new ScrollAppearItem($element);
+	return newItem;
 }
 
 class ScrollAppearItem {
@@ -155,3 +161,35 @@ class ScrollAppearItem {
 // without also exporting its constructor
 type ScrollAppearItemType = InstanceType<typeof ScrollAppearItem>;
 export { ScrollAppearItemType as ScrollAppearItem };
+
+/**
+ * This `MutationObserver` is used to forget about `Element`s that have been
+ * removed from the DOM, so the `scrollAppearItems` `Map` won't prevent them
+ * from being garbage collected.
+ *
+ * If an `Element` is removed from the DOM then added back again later, it will
+ * be re-initialised.
+ */
+const scrollAppearItemObserver = new MutationObserver(_checkRemovedElements);
+
+/**
+ * Whenever `Node`s are added or removed from the DOM, look for any
+ * `Element`s used as keys in `scrollAppearItems` that have been removed
+ * without also having been added, and remove any found from the `Map` so
+ * they can be garbage collected.
+ */
+function _checkRemovedElements(mutations: MutationRecord[], observer: MutationObserver): void {
+	// Instead of collating all removed `Node`s and their descendants that exist
+	// in `scrollAppearItems` and haven't also been added elsewhere, just check
+	// if each `Element` key in `scrollAppearItems` is still in the DOM.
+	for (const $element of scrollAppearItems.keys()) {
+		if (document.body.contains($element) === false) {
+			scrollAppearItems.delete($element);
+		}
+	}
+}
+
+scrollAppearItemObserver.observe(document, {
+	childList: true,
+	subtree: true,
+});

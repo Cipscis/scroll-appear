@@ -58,7 +58,7 @@ function _initObserver(): void {
 }
 
 /**
- * If any new `Element`s have been added, initialise any new `ScrollAppearItem`
+ * If any new `Element`s have been added, initialise any new `ScrollAppearItem`s
  */
 function _checkNewElements(mutations: MutationRecord[], oberver: MutationObserver): void {
 	let nodesAdded = false;
@@ -71,9 +71,9 @@ function _checkNewElements(mutations: MutationRecord[], oberver: MutationObserve
 	}
 
 	if (nodesAdded === true) {
-		const $newElements = document.querySelectorAll(selectors.newItem);
-		if ($newElements.length > 0) {
-			_initAndQueueItems($newElements);
+		const $elements = document.querySelectorAll(selectors.item);
+		if ($elements.length > 0) {
+			_initAndQueueItems($elements);
 		}
 	}
 }
